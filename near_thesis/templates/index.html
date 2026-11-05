@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>near-thesis · NEAR, measured</title>
+<meta name="description" content="Evidence-first long-term investment thesis for NEAR Protocol: reproducible on-chain data, charts and a re-runnable bull/base/bear model.">
+<style>
+  :root{--ink:#14181d;--muted:#5d6876;--line:#e3e7ec;--bg:#f7f8fa;--card:#fff;--green:#00a37a;--blue:#3b6fd8;--orange:#e07b2a;--red:#c8453b}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:#0d1117;color:#fff;padding:36px 24px 30px}
+  .wrap{max-width:1180px;margin:0 auto}
+  header .eyebrow{color:#7ee2c1;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+  header h1{margin:6px 0 8px;font-size:34px;line-height:1.15}
+  header p{margin:0;color:#c3cad4;max-width:820px}
+  header .meta{margin-top:14px;font-size:13px;color:#9aa4b2}
+  header a{color:#7ee2c1}
+  main{padding:24px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:26px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .l{font-size:12.5px;color:var(--muted)}
+  .kpi .v{font-size:24px;font-weight:700;margin-top:2px}
+  .kpi .s{font-size:12.5px;color:var(--muted)}
+  h2{font-size:20px;margin:30px 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(540px,1fr));gap:16px}
+  @media (max-width:620px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card .sent{margin:0 0 10px;color:#2b333d;font-size:14px}
+  .card canvas{width:100%!important;height:270px!important}
+  details{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  details code{background:#f1f3f6;padding:1px 5px;border-radius:4px;color:#26313c;word-break:break-all}
+  details a{color:var(--blue)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--card)}
+  th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:#f1f3f6;font-weight:600}
+  .tablecard{overflow-x:auto}
+  .pos{color:var(--green);font-weight:600}.neg{color:var(--red);font-weight:600}
+  .note{color:var(--muted);font-size:13px}
+  footer{padding:26px 24px 40px;color:var(--muted);font-size:13px}
+  .pill{display:inline-block;background:#eef8f4;color:#0b7a5c;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:6px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">NEAR HACKATHON · Investment Thesis track</div>
+  <h1>NEAR, measured: is Intents volume the real usage signal?</h1>
+  <p>An evidence-first, long-term thesis for NEAR. Every number on this page is computed from public data (NEAR RPC, NearBlocks, DefiLlama, CoinGecko, GitHub) by one command, and the valuation model's assumptions are a YAML file you can edit. Judged on evidence, not conviction: what cuts against the thesis is shown too.</p>
+  <div class="meta" id="meta"></div>
+</div></header>
+<main><div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <h2>Evidence</h2>
+  <div class="grid" id="cards"></div>
+  <h2>Valuation model: bull / base / bear</h2>
+  <div class="card tablecard" id="model"></div>
+  <h2>Sensitivity: base case present value per NEAR</h2>
+  <div class="card tablecard" id="sens"></div>
+  <h2>Data provenance</h2>
+  <div class="card tablecard" id="prov"></div>
+</div></main>
+<footer><div class="wrap">
+  <p><span class="pill">Not financial advice</span>This is research, not a price call. The model values only measurable cash flows; markets also price things it ignores.</p>
+  <p>Built by Hark, an AI agent, under the direction of Rajesh Mullippa, for NEAR HACKATHON (Nov 2026). Source, data and model: <a href="https://github.com/rajeshmullippa-collab/near-thesis">github.com/rajeshmullippa-collab/near-thesis</a> · Read the thesis: <a href="https://github.com/rajeshmullippa-collab/near-thesis/blob/main/THESIS.md">THESIS.md</a></p>
+</div></footer>
+<script src="vendor/chart.umd.min.js"></script>
+<script>
+const D = /*__DATA__*/null;
+const fmtUSD = x => { if (x==null) return 'n/a'; const a=Math.abs(x); for (const [d,s] of [[1e12,'T'],[1e9,'B'],[1e6,'M'],[1e3,'K']]) if (a>=d) return '$'+(x/d).toFixed(a/d>=100?0:a/d>=10?1:2)+s; return '$'+x.toFixed(2); };
+const fmtN = x => { if (x==null) return 'n/a'; const a=Math.abs(x); for (const [d,s] of [[1e9,'B'],[1e6,'M'],[1e3,'K']]) if (a>=d) return (x/d).toFixed(1)+s; return Math.round(x).toString(); };
+const pct = (x,d=0) => x==null?'n/a':(x*100).toFixed(d)+'%';
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const C = {green:'#00a37a', blue:'#3b6fd8', orange:'#e07b2a', red:'#c8453b', ink:'#14181d', grey:'#8a94a3'};
+
+document.getElementById('meta').innerHTML = `Data as of <b>${D.as_of}</b> (UTC) · built ${D.built_at} · ${esc(D.mode)}`;
+document.getElementById('kpis').innerHTML = D.kpis.map(k => `<div class="kpi"><div class="l">${esc(k.label)}</div><div class="v">${esc(k.value)}</div><div class="s">${esc(k.sub)}</div></div>`).join('');
+
+const cardsEl = document.getElementById('cards');
+for (const c of D.cards) {
+  const el = document.createElement('div'); el.className = 'card'; el.id = 'card-' + c.id;
+  el.innerHTML = `<h3>${esc(c.title)}</h3><p class="sent">${esc(c.sentence)}</p><canvas id="cv-${c.id}"></canvas>
+  <details><summary>Source &amp; method</summary><p>${c.sources.map(s => '<code>'+esc(s)+'</code>').join('<br>')}</p><p>${esc(c.method)}</p><p><a href="${c.png}">Static PNG</a></p></details>`;
+  cardsEl.appendChild(el);
+}
+
+const S = D.series;
+const base = {responsive:true, maintainAspectRatio:false, animation:false, interaction:{mode:'index', intersect:false}, plugins:{legend:{labels:{boxWidth:12, font:{size:11}}}}, scales:{x:{ticks:{maxTicksLimit:8, font:{size:10}}, grid:{display:false}}}};
+const yUSD = (extra={}) => Object.assign({ticks:{callback:v=>fmtUSD(v), font:{size:10}}}, extra);
+const yN = (extra={}) => Object.assign({ticks:{callback:v=>fmtN(v), font:{size:10}}}, extra);
+const line = (label, data, color, extra={}) => Object.assign({label, data, borderColor:color, backgroundColor:color, borderWidth:2, pointRadius:0, tension:0.2, spanGaps:true}, extra);
+const mk = (id, cfg) => { const el = document.getElementById('cv-'+id); if (el && window.Chart) new Chart(el, cfg); };
+
+if (window.Chart) {
+  mk('usage', {type:'line', data:{labels:S.usage.labels, datasets:[line('Transactions / day', S.usage.txns, C.blue), line('Active accounts / day', S.usage.active_accounts, C.green)]}, options:{...base, scales:{...base.scales, y:yN({type:'logarithmic'})}}});
+  mk('intents_vs_price', {type:'bar', data:{labels:S.intents_vs_price.labels, datasets:[{label:'Intents volume / day (weekly avg)', data:S.intents_vs_price.intents_volume_usd, backgroundColor:'rgba(0,163,122,.45)', yAxisID:'y'}, line('NEAR price', S.intents_vs_price.price_usd, C.ink, {type:'line', yAxisID:'y1'})]}, options:{...base, scales:{...base.scales, y:yUSD(), y1:yUSD({position:'right', grid:{display:false}})}}});
+  mk('fees', {type:'line', data:{labels:S.fees.labels, datasets:[line('L1 gas fees / day', S.fees.fee_usd, C.blue), line('Intents gross fees / day', S.fees.intents_fees_usd, C.orange), line('Intents revenue captured by NEAR / day', S.fees.intents_revenue_usd, C.green)]}, options:{...base, scales:{...base.scales, y:yUSD({type:'logarithmic'})}}});
+  mk('supply', {type:'line', data:{labels:S.supply.labels, datasets:[line('Total supply (NEAR)', S.supply.total_supply_near, C.ink, {yAxisID:'y'}), line('Supply growth, trailing 365d', S.supply.supply_growth_365d, C.red, {yAxisID:'y1'})]}, options:{...base, scales:{...base.scales, y:yN(), y1:{position:'right', min:0, max:0.06, grid:{display:false}, ticks:{callback:v=>pct(v,1), font:{size:10}}}}}});
+  mk('tvl', {type:'line', data:{labels:S.tvl.labels, datasets:[line('DeFi TVL', S.tvl.defi_tvl_usd, C.green), line('Stablecoins', S.tvl.stablecoins_usd, C.blue)]}, options:{...base, scales:{...base.scales, y:yUSD()}}});
+  const cs = S.staking.cumulative_share;
+  mk('staking', {type:'line', data:{labels:cs.map((_,i)=>i+1), datasets:[line('Cumulative share of stake', cs, C.green), line('One third', cs.map(()=>1/3), C.red, {borderDash:[5,4], borderWidth:1})]}, options:{...base, scales:{x:{type:'logarithmic', title:{display:true, text:'Validators, largest first (log)'}, ticks:{font:{size:10}}}, y:{min:0, max:1, ticks:{callback:v=>pct(v), font:{size:10}}}}}});
+  if (S.devs) mk('devs', {type:'bar', data:{labels:S.devs.labels, datasets:[{label:'Commits / week (tracked core repos)', data:S.devs.commits, backgroundColor:'rgba(59,111,216,.6)'}]}, options:{...base, scales:{...base.scales, y:yN()}}});
+  const LL = S.lead_lag, names = {price_usd:'NEAR price', txns:'Transactions', active_accounts:'Active accounts', defi_tvl_usd:'DeFi TVL'}, cols = [C.ink, C.blue, C.green, C.orange];
+  const lags = Object.keys(Object.values(LL)[0].by_lag).map(Number).sort((a,b)=>a-b);
+  const thr = Object.values(LL)[0].significance_threshold_95;
+  mk('lead_lag', {type:'line', data:{labels:lags, datasets:[...Object.entries(LL).map(([k,v],i)=>line(names[k]||k, lags.map(l=>v.by_lag[String(l)]), cols[i%4], {pointRadius:2})), line('noise band +', lags.map(()=>thr), C.grey, {borderDash:[4,4], borderWidth:1}), line('noise band −', lags.map(()=>-thr), C.grey, {borderDash:[4,4], borderWidth:1})]}, options:{...base, scales:{x:{title:{display:true, text:'Lag in weeks (positive = Intents volume moves first)'}}, y:{min:-0.6, max:0.6, title:{display:true, text:'r, weekly % changes'}}}}});
+  const sc = D.model.scenarios;
+  mk('scenarios', {type:'bar', data:{labels:['Bear','Base','Bull'], datasets:[{label:'Present value per NEAR (fundamentals only)', data:['bear','base','bull'].map(n=>sc[n].present_value_per_token_usd), backgroundColor:[C.red,C.blue,C.green]}, line('Price today', [1,2,3].map(()=>D.model.start.price_usd), C.ink, {type:'line', borderDash:[6,4], borderWidth:1.5})]}, options:{...base, scales:{x:{grid:{display:false}}, y:yUSD()}}});
+} else {
+  for (const c of D.cards) { const cv = document.getElementById('cv-'+c.id); const img = new Image(); img.src = c.png; img.style.width='100%'; cv.replaceWith(img); }
+}
+
+// Model table
+const M = D.model, sc = M.scenarios, N = ['bear','base','bull'];
+const r = (label, f) => `<tr><td>${label}</td>${N.map(n=>`<td>${f(sc[n])}</td>`).join('')}</tr>`;
+const signed = x => `<span class="${x>=0?'pos':'neg'}">${x>=0?'+':''}${(x*100).toFixed(0)}%</span>`;
+document.getElementById('model').innerHTML = `<p class="note">Horizon ${M.horizon_years} years. Starting point from data: Intents volume ${fmtUSD(M.start.intents_volume_start_usd)}/yr (last 30 days annualized), net take-rate ${M.start.intents_take_rate_bps.toFixed(2)} bps, L1 fees ${fmtUSD(M.start.l1_fees_start_usd)}/yr, supply growth ${pct(M.start.supply_growth,1)}/yr, price ${fmtUSD(M.start.price_usd)}. Re-run with your own numbers: edit <code>config/assumptions.yaml</code> and run <code>make model</code>.</p>
+<table><thead><tr><th></th><th>Bear</th><th>Base</th><th>Bull</th></tr></thead><tbody>
+${r('Intents volume growth / yr', s=>pct(s.inputs.intents_volume_cagr))}
+${r('Take-rate change by horizon', s=>signed(s.inputs.take_rate_change))}
+${r('Share of Intents revenue reaching holders', s=>pct(s.inputs.value_accrual_share))}
+${r('L1 fee growth / yr', s=>signed(s.inputs.l1_fee_cagr))}
+${r('Exit multiple (× holder earnings)', s=>s.inputs.exit_multiple+'×')}
+${r('Discount rate', s=>pct(s.inputs.discount_rate))}
+${r('Intents volume, year '+M.horizon_years, s=>fmtUSD(s.intents_volume_usd_T))}
+${r('Holder earnings, year '+M.horizon_years, s=>fmtUSD(s.holder_earnings_usd_T))}
+${r('Network value, year '+M.horizon_years, s=>fmtUSD(s.network_value_usd_T))}
+${r('<b>Present value per NEAR</b>', s=>'<b>'+fmtUSD(s.present_value_per_token_usd)+'</b>')}
+${r('vs price today', s=>signed(s.pv_vs_price))}
+${r('Intents growth / yr that today\'s price implies', s=>pct(s.implied_intents_volume_cagr_for_price))}
+</tbody></table>`;
+const SE = M.sensitivity;
+document.getElementById('sens').innerHTML = `<p class="note">Rows: Intents volume growth per year. Columns: exit multiple. Other inputs as in the base case. Today's price: ${fmtUSD(M.start.price_usd)}.</p><table><thead><tr><th>Growth \\ multiple</th>${SE.cols_exit_multiple.map(m=>`<th>${m}×</th>`).join('')}</tr></thead><tbody>${SE.rows_intents_volume_cagr.map((g,i)=>`<tr><td>${pct(g)}</td>${SE.present_value_per_token_usd[i].map(v=>`<td class="${v>=M.start.price_usd?'pos':''}">${fmtUSD(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+document.getElementById('prov').innerHTML = `<table><thead><tr><th>Snapshot</th><th>Source</th><th>Fetched</th><th>Status</th></tr></thead><tbody>${Object.entries(D.manifest).map(([k,v])=>`<tr><td>${esc(k)}</td><td style="text-align:left"><code>${esc(v.source||'')}</code></td><td>${esc(v.fetched_at||'')}</td><td>${esc((v.status||'').slice(0,40))}</td></tr>`).join('')}</tbody></table>`;
+</script>
+</body>
+</html>

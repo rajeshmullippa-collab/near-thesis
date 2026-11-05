@@ -1,0 +1,58 @@
+# Valuation assumptions for near-thesis.
+#
+# Edit any number here and re-run `python -m near_thesis run --offline` (or
+# `make model`) to see what changes. Every assumption is explicit. Values
+# marked `from_data` are filled in from the snapshot at run time, and the
+# value used is printed in docs/data/model.json and on the dashboard.
+#
+# What the model is: a fundamentals-only view of what NEAR's measurable cash
+# flows (L1 fees and NEAR Intents protocol revenue) could support in
+# `horizon_years`, discounted back to today. It deliberately ignores
+# "monetary premium" (value people put on L1 tokens beyond cash flows), so
+# the gap between today's market cap and the model is reported, not hidden.
+#
+# What it is NOT: a price target or a recommendation.
+
+horizon_years: 5
+
+# Starting points. `from_data` = taken from the snapshot:
+#   intents_volume_start_usd: last 30 days of NEAR Intents volume, annualized
+#   intents_take_rate_bps:    DefiLlama "revenue" / volume, last 30 days
+#   l1_fees_start_usd:        trailing-365-day NEAR L1 transaction fees (USD)
+#   supply_growth:            protocol max_inflation_rate (from RPC)
+start:
+  intents_volume_start_usd: from_data
+  intents_take_rate_bps: from_data
+  l1_fees_start_usd: from_data
+  supply_growth: from_data
+
+scenarios:
+  bear:
+    intents_volume_cagr: 0.00        # volume flat in USD for 5 years
+    take_rate_change: -0.50          # competition halves the net take-rate
+    value_accrual_share: 0.50        # share of captured Intents revenue that reaches NEAR holders (today: 100% funds buybacks, per revenue.near.org / DefiLlama)
+    l1_fee_cagr: -0.05               # L1 fees keep drifting down
+    l1_fee_burn_share: 1.00          # RPC protocol config: burnt_gas_reward = 0/1, i.e. all gas fees are burned
+    exit_multiple: 15                # value / holder-accruing earnings at the horizon
+    discount_rate: 0.20
+  base:
+    intents_volume_cagr: 0.35
+    take_rate_change: -0.20
+    value_accrual_share: 1.00
+    l1_fee_cagr: 0.05
+    l1_fee_burn_share: 1.00
+    exit_multiple: 25
+    discount_rate: 0.15
+  bull:
+    intents_volume_cagr: 0.70
+    take_rate_change: 0.20
+    value_accrual_share: 1.00
+    l1_fee_cagr: 0.25
+    l1_fee_burn_share: 1.00
+    exit_multiple: 40
+    discount_rate: 0.12
+
+# Sensitivity grid (base scenario, varying two inputs).
+sensitivity:
+  intents_volume_cagr: [0.0, 0.2, 0.35, 0.5, 0.7, 1.0]
+  exit_multiple: [10, 15, 25, 40, 60]

@@ -1,0 +1,25 @@
+name: CI
+
+# Runs the whole pipeline on the committed data snapshot (no network calls to
+# data sources), then the tests. This is what "it runs" means for this repo.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Rebuild everything from the cached snapshot
+        run: python -m near_thesis run --offline
+      - name: Tests
+        run: python -m pytest -q
+      - name: Model only (prints bull/base/bear)
+        run: python -m near_thesis model
