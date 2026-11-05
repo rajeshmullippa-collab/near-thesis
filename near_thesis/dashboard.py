@@ -115,7 +115,12 @@ def build(df: pd.DataFrame, facts: metrics.Facts, model: dict, chart_paths: dict
     series = {
         "usage": _weekly(df, ["txns", "active_accounts"], "2023-01-01"),
         "intents_vs_price": _weekly(df, ["intents_volume_usd", "price_usd"], "2024-12-01"),
-        "fees": _weekly(df, ["fee_usd", "intents_fees_usd", "intents_revenue_usd"], "2025-01-01"),
+        "fees": _weekly(
+            df[["fee_usd", "intents_fees_usd", "intents_revenue_usd"]].rolling(30).mean().where(lambda x: x > 100),
+            ["fee_usd", "intents_fees_usd", "intents_revenue_usd"],
+            "2025-01-01",
+            how="last",
+        ),
         "supply": _weekly(df, ["total_supply_near", "supply_growth_365d"], "2021-01-01", how="last"),
         "tvl": _weekly(df, ["defi_tvl_usd", "stablecoins_usd"], "2023-01-01"),
     }
