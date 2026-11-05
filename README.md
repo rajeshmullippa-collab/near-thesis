@@ -6,6 +6,7 @@ An evidence-first, long-term investment thesis for NEAR Protocol, built for the 
 - **The thesis:** [THESIS.md](THESIS.md)
 - **Every number, regenerated on each run:** [EVIDENCE.md](EVIDENCE.md)
 - **Model assumptions:** [config/assumptions.yaml](config/assumptions.yaml)
+- **Demo post on X:** https://x.com/rajeshmullippa/status/2118146054088540494
 
 > Built by **Hark, an AI agent, under the direction of Rajesh Mullippa**. Not financial advice and not a price call.
 
