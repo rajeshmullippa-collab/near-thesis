@@ -1,76 +1,76 @@
 {
   "rpc_block": {
-    "fetched_at": "2026-11-07T02:55:42Z",
+    "fetched_at": "2026-11-08T02:57:52Z",
     "source": "NEAR RPC `block` (finality=final)",
     "status": "ok"
   },
   "rpc_validators": {
-    "fetched_at": "2026-11-07T02:55:45Z",
+    "fetched_at": "2026-11-08T02:57:55Z",
     "source": "NEAR RPC `validators` [null]",
     "status": "ok"
   },
   "rpc_protocol_config": {
-    "fetched_at": "2026-11-07T02:55:48Z",
+    "fetched_at": "2026-11-08T02:57:58Z",
     "source": "NEAR RPC `EXPERIMENTAL_protocol_config`",
     "status": "ok"
   },
   "nearblocks_charts": {
-    "fetched_at": "2026-11-07T02:55:49Z",
+    "fetched_at": "2026-11-08T02:58:00Z",
     "source": "GET https://api.nearblocks.io/v1/charts",
     "status": "ok"
   },
   "nearblocks_stats": {
-    "fetched_at": "2026-11-07T02:55:49Z",
+    "fetched_at": "2026-11-08T02:58:00Z",
     "source": "GET https://api.nearblocks.io/v1/stats",
     "status": "ok"
   },
   "llama_chain_tvl": {
-    "fetched_at": "2026-11-07T02:55:49Z",
+    "fetched_at": "2026-11-08T02:58:00Z",
     "source": "GET https://api.llama.fi/v2/historicalChainTvl/Near",
     "status": "ok"
   },
   "llama_chain_dex": {
-    "fetched_at": "2026-11-07T02:55:50Z",
+    "fetched_at": "2026-11-08T02:58:01Z",
     "source": "GET https://api.llama.fi/overview/dexs/near?dataType=dailyVolume",
     "status": "ok"
   },
   "llama_chain_fees": {
-    "fetched_at": "2026-11-07T02:55:50Z",
+    "fetched_at": "2026-11-08T02:58:01Z",
     "source": "GET https://api.llama.fi/summary/fees/near?dataType=dailyFees",
     "status": "ok"
   },
   "llama_intents_volume": {
-    "fetched_at": "2026-11-07T02:55:51Z",
+    "fetched_at": "2026-11-08T02:58:02Z",
     "source": "GET https://api.llama.fi/summary/dexs/near-intents?dataType=dailyVolume",
     "status": "ok"
   },
   "llama_intents_fees": {
-    "fetched_at": "2026-11-07T02:55:51Z",
+    "fetched_at": "2026-11-08T02:58:03Z",
     "source": "GET https://api.llama.fi/summary/fees/near-intents?dataType=dailyFees",
     "status": "ok"
   },
   "llama_intents_revenue": {
-    "fetched_at": "2026-11-07T02:55:51Z",
+    "fetched_at": "2026-11-08T02:58:04Z",
     "source": "GET https://api.llama.fi/summary/fees/near-intents?dataType=dailyRevenue",
     "status": "ok"
   },
   "llama_stablecoins": {
-    "fetched_at": "2026-11-07T02:55:51Z",
+    "fetched_at": "2026-11-08T02:58:05Z",
     "source": "GET https://stablecoins.llama.fi/stablecoincharts/Near",
     "status": "ok"
   },
   "coingecko_market_chart": {
-    "fetched_at": "2026-11-07T02:56:00Z",
+    "fetched_at": "2026-11-08T02:58:15Z",
     "source": "GET https://api.coingecko.com/api/v3/coins/near/market_chart?vs_currency=usd&days=365",
     "status": "ok"
   },
   "github_commit_activity": {
-    "fetched_at": "2026-11-07T03:00:06Z",
+    "fetched_at": "2026-11-08T03:04:10Z",
     "source": "GET https://api.github.com/repos/<repo>/stats/commit_activity for near/nearcore, near/near-sdk-rs, near/near-api-js, near/near-cli-rs, near/docs, near/intents, near/mpc, nearai/nearai",
     "status": "ok"
   },
   "rpc_revenue_wallets": {
-    "fetched_at": "2026-11-07T02:56:00Z",
+    "fetched_at": "2026-11-08T02:58:14Z",
     "source": "NEAR RPC `query` view_account for buybacks.multisignature.near, fefundsadmin.sputnik-dao.near, 1csfundsadmin.sputnik-dao.near",
     "status": "ok"
   }
